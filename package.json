@@ -1,0 +1,25 @@
+{
+  "name": "dawn-internet-monitor",
+  "version": "1.0.0",
+  "description": "Monitor Dawn Internet points and referrals with Discord notifications",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "dawn",
+    "monitor",
+    "discord",
+    "bot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cloudscraper": "^4.6.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
