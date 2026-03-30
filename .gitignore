@@ -24,7 +24,6 @@ Thumbs.db
 *.swo
 
 # Replit
-.replit
 replit.nix
 replit.md
 
