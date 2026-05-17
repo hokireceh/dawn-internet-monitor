@@ -159,7 +159,8 @@ async function getGrassActiveDevices() {
     });
     return response.result.data;
   } catch (error) {
-    throw new Error(`Grass ActiveDevices Failed: ${error.message}`);
+    console.warn(`⚠️  Grass ActiveDevices: ${error.message}`);
+    return null;
   }
 }
 
@@ -178,7 +179,8 @@ async function getGrassEpochEarnings() {
     const data = response.result.data.data;
     return data && data.length > 0 ? data[0] : null;
   } catch (error) {
-    throw new Error(`Grass EpochEarnings Failed: ${error.message}`);
+    console.warn(`⚠️  Grass EpochEarnings: ${error.message}`);
+    return null;
   }
 }
 
