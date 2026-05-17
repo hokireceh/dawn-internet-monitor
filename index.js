@@ -1,5 +1,9 @@
 require('dotenv').config();
 const cloudscraper = require('cloudscraper');
+const { v4: uuidv4 } = require('uuid');
+
+// Extension ID tetap (disimpan sekali selama proses berjalan)
+const DAWN_EXTENSION_ID = uuidv4();
 
 // Konfigurasi dari .env
 const CONFIG = {
@@ -12,13 +16,15 @@ const CONFIG = {
   grassDiscordWebhook: process.env.GRASS_DISCORD_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL,
   // Interval
   interval: parseInt(process.env.CHECK_INTERVAL) || 60000,
-  sendInterval: parseInt(process.env.DISCORD_INTERVAL) || 300000
+  sendInterval: parseInt(process.env.DISCORD_INTERVAL) || 300000,
+  dawnPingInterval: 1200000 // 20 menit — sama dengan ekstensi resmi Dawn
 };
 
 let lastDiscordSendDawn = 0;
 let lastDiscordSendGrass = 0;
 let previousDawnData = null;
 let previousGrassData = null;
+let dawnPingInProgress = false;
 
 // Base headers
 const baseHeaders = {
@@ -67,6 +73,46 @@ async function getDawnPoints() {
     return response;
   } catch (error) {
     throw new Error(`Dawn Points Request Failed: ${error.message}`);
+  }
+}
+
+async function dawnPing() {
+  if (!CONFIG.authToken || !CONFIG.userId) return;
+  if (dawnPingInProgress) {
+    console.log('⏭️  Dawn Ping: Sudah berjalan, skip.');
+    return;
+  }
+  dawnPingInProgress = true;
+  try {
+    const headers = {
+      ...baseHeaders,
+      'Accept': 'application/json, text/plain, */*',
+      'Authorization': `Bearer ${CONFIG.authToken}`,
+      'Content-Type': 'application/json'
+    };
+    const body = {
+      user_id: CONFIG.userId,
+      extension_id: DAWN_EXTENSION_ID,
+      timestamp: new Date().toISOString()
+    };
+    const response = await cloudscraper.post(
+      'https://api.dawninternet.com/ping?role=extension',
+      { headers, json: true, body }
+    );
+    console.log(`✅ Dawn Ping ✓ — Pong received at ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`);
+    return response;
+  } catch (error) {
+    console.error(`❌ Dawn Ping ✗ — ${error.message}`);
+    if (CONFIG.discordWebhook) {
+      await sendDiscordEmbed(CONFIG.discordWebhook, {
+        title: '⚠️ Dawn Ping Gagal',
+        description: `**Error:** ${error.message}`,
+        color: 15158332,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } finally {
+    dawnPingInProgress = false;
   }
 }
 
@@ -565,11 +611,22 @@ function validateConfig() {
 validateConfig();
 
 console.log('🚀 Dawn & Grass Monitor dimulai...');
-console.log(`📊 Check interval : ${CONFIG.interval / 1000} detik`);
-console.log(`📤 Discord interval: ${CONFIG.sendInterval / 1000} detik\n`);
+console.log(`📊 Check interval  : ${CONFIG.interval / 1000} detik`);
+console.log(`📤 Discord interval: ${CONFIG.sendInterval / 1000} detik`);
+if (CONFIG.authToken && CONFIG.userId) {
+  console.log(`🏓 Dawn ping interval: ${CONFIG.dawnPingInterval / 1000} detik (${CONFIG.dawnPingInterval / 60000} menit)`);
+}
+console.log('');
 
+// Jalankan monitor & ping pertama kali langsung
 monitor();
+dawnPing();
+
+// Set interval monitor (ambil data & notif Discord)
 setInterval(monitor, CONFIG.interval);
+
+// Set interval ping Dawn — terpisah dari monitor, setiap 20 menit
+setInterval(dawnPing, CONFIG.dawnPingInterval);
 
 process.on('SIGINT', () => {
   console.log('\n\n👋 Monitor dihentikan. Terima kasih!');
