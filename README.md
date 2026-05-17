@@ -31,8 +31,8 @@ Monitor akun **Dawn Internet** dan **Grass** secara real-time dengan notifikasi 
 
 1. **Clone repository**
    ```bash
-   git clone https://github.com/hokireceh/dawn-internet-monitor.git
-   cd dawn-internet-monitor
+   git clone https://github.com/hokireceh/dawn-ft-grass.git
+   cd dawn-ft-grass
    ```
 
 2. **Install dependencies**
@@ -271,7 +271,7 @@ Jika tool ini bermanfaat, berikan ⭐ di repository!
 ## 📞 Contact
 
 - GitHub: [@hokireceh](https://github.com/hokireceh)
-- Repository: [dawn-internet-monitor](https://github.com/hokireceh/dawn-internet-monitor)
+- Repository: [dawn-ft-grass](https://github.com/hokireceh/dawn-ft-grass)
 
 ---
 
