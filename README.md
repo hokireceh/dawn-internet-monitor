@@ -1,6 +1,6 @@
 # 🌅🌿 Dawn & Grass Internet Monitor
 
-Monitor akun **Dawn Internet** dan **Grass** secara real-time dengan notifikasi ke Discord! Script Node.js ini memantau points, referral, dan device aktif secara otomatis 24/7.
+Monitor akun **Dawn Internet** dan **Grass** secara real-time dengan notifikasi ke Discord! Script Node.js ini memantau points, referral, dan device aktif secara otomatis 24/7 — sekaligus **menjalankan Grass WebSocket node** dan **Dawn ping** untuk mengumpulkan uptime points terus-menerus.
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -17,6 +17,8 @@ Monitor akun **Dawn Internet** dan **Grass** secara real-time dengan notifikasi 
 - 🎨 **Rich Embeds**: Format cantik dengan warna dan emoji
 - ⚙️ **Configurable**: Interval dapat disesuaikan via environment variables
 - 🛡️ **Cloudflare Bypass**: Auto-bypass Cloudflare dengan cloudscraper
+- 🌐 **Dawn Ping**: HTTP ping otomatis setiap 20 menit ke endpoint Dawn untuk mengumpulkan uptime points
+- 🔌 **Grass WebSocket Node**: Menjalankan node Grass secara otomatis (checkin → WebSocket → earn uptime points) dengan auto-reconnect
 
 ## 📋 Prerequisites
 
@@ -51,12 +53,16 @@ Monitor akun **Dawn Internet** dan **Grass** secara real-time dengan notifikasi 
    - `USER_ID`: dari parameter `user_id` di URL
    - `AUTH_TOKEN`: dari header `Authorization` (copy yang **setelah** kata "Bearer ")
 
+> ⚠️ Token Dawn bertipe `session` dan berlaku selama **30 hari**. Perbarui setiap bulan.
+
 ### 🌿 Dapatkan Token Grass
 
 1. Login ke [app.getgrass.io](https://app.getgrass.io/)
 2. Buka **Developer Tools** (F12) → tab **Network**
 3. Refresh halaman, cari request ke `api.grass.io`
 4. Buka tab **Headers**, ambil nilai dari header `authorization` (keseluruhan JWT, dimulai dengan `eyJ...`)
+
+> ⚠️ Token Grass umumnya berlaku selama **1 tahun**. Perbarui jika muncul error 401.
 
 ### Discord Webhook
 
@@ -71,7 +77,7 @@ Kamu bisa menggunakan satu webhook yang sama untuk Dawn dan Grass, atau webhook 
 ```env
 # ── Dawn Internet ─────────────────────────────────────────
 USER_ID=your_dawn_user_id
-AUTH_TOKEN=your_dawn_auth_token
+AUTH_TOKEN=your_dawn_auth_token_without_bearer_prefix
 
 # ── Grass ─────────────────────────────────────────────────
 GRASS_AUTH_TOKEN=your_grass_jwt_token
@@ -84,8 +90,8 @@ DISCORD_WEBHOOK_URL=https://discordapp.com/api/webhooks/YOUR_ID/YOUR_TOKEN
 # GRASS_DISCORD_WEBHOOK_URL=https://discordapp.com/api/webhooks/YOUR_ID/YOUR_TOKEN
 
 # ── Interval (milliseconds) ───────────────────────────────
-CHECK_INTERVAL=600000      # Check API setiap 600 detik (10 menit)
-DISCORD_INTERVAL=600000    # Kirim Discord setiap 600 detik (10 menit)
+CHECK_INTERVAL=300000      # Check API setiap 300 detik (5 menit), default: 300000
+DISCORD_INTERVAL=600000    # Kirim Discord setiap 600 detik (10 menit), default: 600000
 ```
 
 **Required (minimal salah satu)**: `AUTH_TOKEN` + `USER_ID` (Dawn) atau `GRASS_AUTH_TOKEN` (Grass)  
@@ -114,59 +120,76 @@ Tekan `Ctrl + C`
 ============================================================
          DAWN & GRASS INTERNET MONITOR
 ============================================================
-Waktu: 31/3/2026, 03.53.52
+Waktu: 18/5/2026, 01.43.00
+⏳ Dawn: Mengambil data...
+🔌 Grass Node: Checkin ke director...
 
 ============================================================
               DAWN INTERNET MONITOR
 ============================================================
+Waktu Check: 18/5/2026, 01.43.00
 📊 REFERRAL STATS:
 ------------------------------------------------------------
-Referral Code       : 8syn4h
+Referral Code       : xxxxxxxx
 Total Referrals     : 3
-Points dari Referral: 356,529
+Points dari Referral: 357,389
 Usage Count         : 0/5000
 
 💰 POINTS INFO:
 ------------------------------------------------------------
-Personal Points     : 281,245
-Referral Points     : 356,337
-Total Points        : 637,582
+Personal Points     : 304,645
+Referral Points     : 357,197
+Total Points        : 661,842
+
+✅ Dawn Ping ✓ — Pong received at 18/5/2026, 01.43.00
 
 ============================================================
                   GRASS MONITOR
 ============================================================
 👤 USER INFO:
 ------------------------------------------------------------
-Username            : doaemak
+Username            : yourUsername
 Country             : Indonesia
+Wallet              : YourWalletAddress
 
 💰 POINTS:
 ------------------------------------------------------------
-Total Points        : 1,719,478.08
-Uptime Points       : 1,560,138
+Total Points        : 1,871,387.95
+Uptime Points       : 1,711,903
 Referral Points     : 52,990
-Desktop Points      : 558,004
+Desktop Points      : 709,710
+Android Points      : 23,211
+Extension Points    : 6,512
 
 👥 REFERRAL:
 ------------------------------------------------------------
-Referral Code       : sTt1b0dE9hniV8-
+Referral Code       : xxxxxxxxxxxxxxx
 Total Referrals     : 7
 Qualified Referrals : 2
 
 📱 ACTIVE DEVICES:
 ------------------------------------------------------------
-Device 1 [desktop]
+Device 1 [extension]
+  IP Score          : 75
+  Multiplier        : x1
+  Agg Uptime        : 21j 13m
+  Last Connected    : 18/05/2026, 01.36.07
+Device 2 [desktop]
   IP Score          : 75
   Multiplier        : x2
+  Agg Uptime        : 21j 13m
 
 🏆 EPOCH EARNINGS:
 ------------------------------------------------------------
-Epoch Name          : Epoch 17
-Period              : 2026-03-04 → 2026-04-03
-Points this Epoch   : 57,454.16
+Epoch Name          : Epoch 19
+Period              : 2026-05-07 → 2026-06-07
+Points this Epoch   : 30,433.62
+Uptime this Epoch   : 202j 56m
+
+✅ Grass Node: WebSocket OPEN — Node aktif, earning uptime points!
 
 ============================================================
-Next check dalam 600 detik
+Next check dalam 300 detik
 ============================================================
 ```
 
@@ -196,10 +219,16 @@ dawn-grass-monitor/
 - Token sudah expired — login ulang ke dashboard layanan yang bersangkutan
 - Ambil token baru dari Developer Tools (Network tab)
 - Update environment variable dengan token baru
+- Dawn: token berlaku 30 hari | Grass: token berlaku ~1 tahun
 
 ### Error: "Gagal kirim ke Discord"
 - Periksa Webhook URL sudah benar dan masih aktif
 - Pastikan webhook belum dihapus dari Discord
+
+### Grass Node tidak connect
+- Pastikan `GRASS_AUTH_TOKEN` valid dan belum expired
+- Cek log untuk pesan error dari WebSocket atau checkin endpoint
+- Script akan auto-reconnect secara otomatis jika koneksi terputus
 
 ### Monitor tidak start
 - Pastikan Node.js sudah terinstall: `node --version`
@@ -211,7 +240,7 @@ dawn-grass-monitor/
 ### Deploy di Replit
 1. Import repository ke Replit
 2. Set environment variables melalui tab **Secrets**
-3. Workflow `npm start` sudah otomatis terkonfigurasi
+3. Workflow `node index.js` sudah otomatis terkonfigurasi
 
 ### Deploy di Server/VPS
 1. Clone repository & setup environment variables
@@ -223,6 +252,8 @@ dawn-grass-monitor/
 
 - **dotenv**: Manage environment variables
 - **cloudscraper**: Bypass Cloudflare protection
+- **ws**: WebSocket client untuk Grass node
+- **uuid**: Generate UUID untuk extension/browser ID
 - **nodemon** (dev): Auto-restart saat file berubah
 
 ## 📝 License
